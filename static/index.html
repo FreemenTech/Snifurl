@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SnifURL — URL Threat Analysis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<div class="scanlines" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
+<canvas id="particles" aria-hidden="true"></canvas>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <path d="M16 2L4 8V16C4 22.627 9.373 28 16 30C22.627 28 28 22.627 28 16V8L16 2Z" stroke="var(--accent)" stroke-width="1.5" fill="none"/>
+          <path d="M16 2L4 8V16C4 22.627 9.373 28 16 30C22.627 28 28 22.627 28 16V8L16 2Z" fill="var(--accent)" fill-opacity="0.08"/>
+          <circle cx="16" cy="16" r="4" fill="var(--accent)"/>
+          <path d="M16 10V12M16 20V22M10 16H12M20 16H22" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="16" cy="16" r="6" stroke="var(--accent)" stroke-width="0.5" stroke-dasharray="2 3"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="logo-main">SNIF<span class="logo-accent">URL</span></span>
+        <span class="logo-sub">URL THREAT ANALYSIS</span>
+      </div>
+    </div>
+    <div class="header-status">
+      <span class="status-dot"></span>
+      <span class="status-text">SYSTEM ACTIVE</span>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+  <section class="hero">
+
+    <div class="hero-badge">
+      <img src="/static/icons/scan.svg" width="13" height="13" class="svg-icon" alt="scan" />
+      ADVANCED ANALYSIS ENGINE v2.1
+    </div>
+
+    <h1 class="hero-title">
+      Detect<br/>
+      <span class="gradient-text">Malicious</span><br/>
+      URLs in real time
+    </h1>
+
+    <p class="hero-desc">
+      Multi-layer heuristic analysis — TLD, SSL, WHOIS, DNS, homographs, encoding &amp; more.
+    </p>
+
+    <!-- INPUT -->
+    <div class="input-section">
+      <div class="input-wrapper" id="inputWrapper">
+        <div class="input-prefix">
+          <img src="/static/icons/search.svg" width="16" height="16" class="svg-icon" alt="search" />
+        </div>
+        <input
+          type="text"
+          id="urlInput"
+          class="url-input"
+          placeholder="https://example.com/page"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="scan-btn" id="scanBtn" onclick="startScan()">
+          <span class="btn-text">ANALYZE</span>
+          <img src="/static/icons/arrow-right.svg" width="16" height="16" class="svg-icon btn-arrow" alt="go" />
+        </button>
+      </div>
+      <div class="input-hint">
+        Press <kbd>Enter</kbd> to start analysis &nbsp;·&nbsp; Any URL supported
+      </div>
+    </div>
+
+    <!-- EXAMPLES -->
+    <div class="examples">
+      <span class="examples-label">Examples:</span>
+      <button class="example-chip" onclick="setExample('https://google.com')">google.com</button>
+      <button class="example-chip" onclick="setExample('https://bit.ly/3xYz123')">bit.ly shortener</button>
+      <button class="example-chip" onclick="setExample('http://paypal.secure-login.xyz/login')">paypal.xyz phishing</button>
+      <button class="example-chip" onclick="setExample('http://192.168.1.100/login')">Direct IP</button>
+    </div>
+
+  </section>
+
+  <!-- LOADER -->
+  <section class="loader-section" id="loaderSection" style="display:none">
+    <div class="loader-box">
+      <div class="loader-ring">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <div class="loader-steps">
+        <div class="loader-step" id="step1">
+          <span class="step-dot"></span>
+          <span>Parsing URL...</span>
+        </div>
+        <div class="loader-step" id="step2">
+          <span class="step-dot"></span>
+          <span>Checking DNS &amp; SSL...</span>
+        </div>
+        <div class="loader-step" id="step3">
+          <span class="step-dot"></span>
+          <span>WHOIS &amp; TLD analysis...</span>
+        </div>
+        <div class="loader-step" id="step4">
+          <span class="step-dot"></span>
+          <span>Calculating risk score...</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="results-section" id="resultsSection" style="display:none">
+
+    <!-- SCORE CARD -->
+    <div class="score-card" id="scoreCard">
+      <div class="score-card-left">
+        <div class="score-label">RISK SCORE</div>
+        <div class="score-display">
+          <div class="score-gauge-wrap">
+            <svg class="score-gauge" viewBox="0 0 200 120">
+              <defs>
+                <linearGradient id="gaugeGradSafe" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#00ff9d"/>
+                  <stop offset="100%" style="stop-color:#00d4ff"/>
+                </linearGradient>
+                <linearGradient id="gaugeGradMed" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#ffcc00"/>
+                  <stop offset="100%" style="stop-color:#ff8800"/>
+                </linearGradient>
+                <linearGradient id="gaugeGradDanger" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#ff4400"/>
+                  <stop offset="100%" style="stop-color:#ff0055"/>
+                </linearGradient>
+              </defs>
+              <path d="M 20 110 A 80 80 0 0 1 180 110" stroke="#1a2035" stroke-width="14" fill="none" stroke-linecap="round"/>
+              <path id="gaugeArc" d="M 20 110 A 80 80 0 0 1 180 110" stroke="url(#gaugeGradSafe)" stroke-width="14" fill="none" stroke-linecap="round" stroke-dasharray="0 251"/>
+              <line x1="20"  y1="110" x2="20"  y2="95" stroke="#0a1628" stroke-width="2"/>
+              <line x1="180" y1="110" x2="180" y2="95" stroke="#0a1628" stroke-width="2"/>
+              <line x1="100" y1="30"  x2="100" y2="20" stroke="#0a1628" stroke-width="2"/>
+            </svg>
+            <div class="score-number-wrap">
+              <span class="score-number" id="scoreNumber">0</span>
+              <span class="score-max">/100</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="score-card-right">
+        <div class="risk-badge" id="riskBadge">
+          <span class="risk-icon" id="riskIcon"></span>
+          <span class="risk-text" id="riskText">SAFE</span>
+        </div>
+        <p class="recommendation-text" id="recommendationText">—</p>
+        <div class="analyzed-url" id="analyzedUrl"></div>
+      </div>
+    </div>
+
+    <!-- INDICATORS -->
+    <div class="section-title">
+      <span class="section-line"></span>
+      DETAILED INDICATORS
+      <span class="section-line"></span>
+    </div>
+    <div class="indicators-grid" id="indicatorsGrid"></div>
+
+    <!-- LOG -->
+    <div class="section-title">
+      <span class="section-line"></span>
+      ANALYSIS LOG
+      <span class="section-line"></span>
+    </div>
+    <div class="details-log" id="detailsLog"></div>
+
+    <!-- WHOIS / SSL -->
+    <div class="info-cards" id="infoCards"></div>
+
+    <!-- RESET -->
+    <div class="reset-wrap">
+      <button class="reset-btn" onclick="resetScan()">
+        <img src="/static/icons/rotate-ccw.svg" width="14" height="14" class="svg-icon" alt="reset" />
+        New analysis
+      </button>
+    </div>
+
+  </section>
+
+  <!-- ERROR -->
+  <section class="error-section" id="errorSection" style="display:none">
+    <div class="error-box">
+      <div class="error-icon">
+        <img src="/static/icons/triangle-alert.svg" width="36" height="36" class="svg-icon svg-danger" alt="error" />
+      </div>
+      <p class="error-msg" id="errorMsg">Unknown error</p>
+      <button class="reset-btn" onclick="resetScan()">Try again</button>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <span>SnifURL &copy; 2025 &mdash; Local + network heuristic analysis</span>
+    <span class="footer-sep">|</span>
+    <span>Results are indicative, no absolute guarantee</span>
+  </div>
+</footer>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
