@@ -4,9 +4,20 @@
 
 ---
 
+## 🌐 Live Demo
+
+SnifURL is publicly accessible — no installation required.
+
+**👉 [https://snifurl.online](https://snifurl.online)**
+![SnifURL Demo](assets/demo.gif)
+
+Paste any URL and get an instant risk score with a full breakdown of every signal detected. Try it directly from your browser.
+
+---
+
 ## What it does
 
-SnifURL analyzes any URL across multiple layers and returns a **risk score from 0 to 100** with a detailed breakdown of every signal detected.
+SnifURL analyzes any URL across multiple layers and returns a risk score from **0 to 100** with a detailed breakdown of every signal detected.
 
 **Indicators checked:**
 - TLD reputation (Freenom, high-risk ccTLDs, crypto TLDs)
@@ -27,13 +38,13 @@ SnifURL analyzes any URL across multiple layers and returns a **risk score from 
 
 ## Risk levels
 
-| Score  | Level    | Meaning                                |
-|--------|----------|----------------------------------------|
-| 0–14   | SAFE     | No significant indicators              |
-| 15–34  | LOW      | Probably safe, stay cautious           |
-| 35–54  | MEDIUM   | Suspicious — manual inspection         |
-| 55–74  | HIGH     | Very suspicious — block unless trusted |
-| 75–100 | CRITICAL | Phishing almost certain — block        |
+| Score  | Level    | Meaning                                   |
+|--------|----------|-------------------------------------------|
+| 0–14   | SAFE     | No significant indicators                 |
+| 15–34  | LOW      | Probably safe, stay cautious              |
+| 35–54  | MEDIUM   | Suspicious — manual inspection            |
+| 55–74  | HIGH     | Very suspicious — block unless trusted    |
+| 75–100 | CRITICAL | Phishing almost certain — block           |
 
 ---
 
@@ -74,7 +85,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Open http://localhost:5000
+Open [http://localhost:5000](http://localhost:5000)
 
 ---
 
@@ -117,6 +128,4 @@ Open http://localhost:5000
 
 MIT — free to use, modify, and distribute.
 
----
-
-Maintainer: Freemen HOUNGBEDJI
+**Maintainer:** Freemen HOUNGBEDJI
